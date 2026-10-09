@@ -1,83 +1,254 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bello Pro Trader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BELLO PRO TRADER</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#08111f;color:#f1f5f9;font-family:Arial,sans-serif;padding:18px}
+body{margin:0;padding:18px;background:#08111f;color:#f1f5f9;font-family:Arial,sans-serif}
 .container{max-width:600px;margin:auto}
-header{display:flex;justify-content:space-between;align-items:center;margin:12px 0 24px}
-h1{font-size:23px;margin:0;color:#38bdf8}
-.badge{font-size:11px;background:#163047;color:#7dd3fc;padding:7px 10px;border-radius:20px}
-.card{background:#111e30;border:1px solid #25354b;border-radius:16px;padding:18px;margin-bottom:15px}
-.label{font-size:13px;color:#94a3b8}
-.value{font-size:29px;font-weight:bold;margin:9px 0}
-.muted{color:#94a3b8;font-size:12px}
+header{display:flex;justify-content:space-between;align-items:center;margin:12px 0 22px}
+h1{font-size:22px;color:#38bdf8;margin:0}
+.badge{background:#163047;color:#7dd3fc;padding:8px;border-radius:20px;font-size:11px}
+.card{background:#111e30;border:1px solid #25354b;border-radius:15px;padding:17px;margin-bottom:14px}
+.label{color:#94a3b8;font-size:13px}
+.value{font-size:27px;font-weight:bold;margin:10px 0}
+.muted{color:#94a3b8;font-size:12px;line-height:1.6}
 .row{display:flex;gap:12px}
 .row>*{flex:1;min-width:0}
-select,input{width:100%;padding:13px;margin-top:8px;border-radius:10px;border:1px solid #334155;background:#0b1728;color:white;font-size:15px}
-button{border:0;border-radius:11px;padding:15px;font-size:15px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px}
+select,input{width:100%;padding:13px;margin-top:8px;border-radius:9px;border:1px solid #334155;background:#0b1728;color:white;font-size:15px}
+button{width:100%;padding:14px;border:0;border-radius:10px;font-weight:bold;font-size:14px;margin-top:10px;cursor:pointer}
+.primary{background:#0284c7;color:white}
 .buy{background:#16a34a;color:white}
 .sell{background:#dc2626;color:white}
 .close{background:#334155;color:white}
-.timer{text-align:center;font-size:36px;font-weight:bold;color:#38bdf8;padding:12px}
-.notice{font-size:12px;line-height:1.6;color:#cbd5e1}
-footer{text-align:center;color:#64748b;font-size:12px;padding:16px}
+.status{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.price{font-size:24px;color:#38bdf8;font-weight:bold;margin-top:8px}
+footer{text-align:center;color:#64748b;font-size:12px;padding:14px}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-<div><h1>BELLO PRO TRADER</h1><div class="muted">Your personal trading dashboard</div></div>
-<div class="badge">DEMO MODE</div>
-</header><div class="card">
-<div class="label">Selected Market</div>
+<div>
+<h1>BELLO PRO TRADER</h1>
+<div class="muted">Personal trading dashboard</div>
+</div>
+<div class="badge">DEMO FIRST</div>
+</header>
+
+<div class="card">
+<div class="label">DERIV ACCOUNT</div>
+<div class="value" id="account">Not connected</div>
+<div class="muted" id="balance">Connect your Deriv account to continue.</div>
+<button class="primary" id="connect" onclick="connectDeriv()">CONNECT DERIV</button>
+<button class="close" id="disconnect" onclick="disconnectDeriv()" hidden>DISCONNECT</button>
+<div class="muted" style="margin-top:10px">
+Login is handled by Deriv. Never enter your password or API token directly into this page.
+</div>
+</div>
+
+<div class="card">
+<div class="label">MARKET PRICE</div>
 <select id="market">
-<option>Boom 1000</option>
-<option>Crash 1000</option>
+<option value="BOOM1000">Boom 1000</option>
+<option value="CRASH1000">Crash 1000</option>
 </select>
-<div class="row">
-<div><div class="label" style="margin-top:18px">Trade Size (Lots)</div><input id="lot" type="number" min="0.01" step="0.01" value="0.01"></div>
-<div><div class="label" style="margin-top:18px">Trade Direction</div><input id="direction" value="No trade" readonly></div>
+<div class="price" id="price">--</div>
+<div class="muted" id="priceStatus">Connect Deriv to request available market data.</div>
+<button class="primary" onclick="subscribePrice()">GET LIVE PRICE</button>
 </div>
-</div><div class="card">
-<div class="label">Profit / Loss</div>
+
+<div class="card">
+<div class="label">TRADING STATUS</div>
 <div class="value" id="pnl">$0.00</div>
-<div class="muted" id="status">No demo trade opened</div>
-<div class="notice" style="margin-top:12px">Demo display only. This page is not connected to Deriv or MT5 and does not show real account profit/loss.</div>
-</div><div class="row">
-<div class="card"><div class="label">Trade Timer</div><div class="timer" id="timer">00:00</div><button onclick="startTimer()" class="close">START TIMER</button></div>
-<div class="card"><div class="label">Trade Controls</div><button class="buy" onclick="demoTrade('BUY')">BUY</button><button class="sell" onclick="demoTrade('SELL')">SELL</button><button class="close" onclick="closeTrade()">CLOSE</button></div>
-</div><div class="card">
-<div class="label">Connection</div>
-<div style="margin-top:10px;color:#fbbf24">● Not connected to MT5</div>
-<p class="notice">These buttons are for interface testing only. They do not place trades or calculate live market P/L. Never enter your MT5 password on this page.</p>
+<div class="status" id="tradeStatus">No trade placed.</div>
+<div class="muted" style="margin-top:10px">
+This dashboard does not place MT5 orders. Price availability depends on your Deriv account and API permissions.
 </div>
-<footer>Bello Pro Trader · Personal Demo Dashboard</footer>
-</div><script>
-let startedAt=null, timerInterval=null, demoOpen=false;
-function demoTrade(direction){
- document.getElementById('direction').value=direction;
- document.getElementById('status').textContent='Demo button tested — no real order sent';
- document.getElementById('pnl').textContent='$0.00';
- demoOpen=true;
- if(!startedAt) startTimer();
+</div>
+
+<div class="row">
+<div class="card">
+<div class="label">TIMER</div>
+<div class="value" id="timer">00:00</div>
+<button class="close" onclick="startTimer()">START TIMER</button>
+<button class="close" onclick="stopTimer()">STOP TIMER</button>
+</div>
+<div class="card">
+<div class="label">DEMO CONTROLS</div>
+<button class="buy" onclick="demo('BUY')">TEST BUY</button>
+<button class="sell" onclick="demo('SELL')">TEST SELL</button>
+<button class="close" onclick="closeDemo()">CLOSE DEMO</button>
+</div>
+</div>
+
+<div class="card">
+<div class="label">CONNECTION DETAILS</div>
+<div class="status" id="connectionStatus">● Not connected</div>
+</div>
+
+<footer>Bello Pro Trader · Use demo trading while testing</footer>
+</div>
+
+<script>
+const APP_ID = "34D25jw5RMSzqlZguN51V";
+const REDIRECT_URI = "https://belloag2005.github.io/bello-pro-trader/";
+let socket = null;
+let authorized = false;
+let timerInterval = null;
+let seconds = 0;
+
+function setStatus(message){
+  document.getElementById("connectionStatus").textContent = message;
 }
-function closeTrade(){
- demoOpen=false;
- document.getElementById('direction').value='No trade';
- document.getElementById('status').textContent='Demo closed — no real order was placed';
- document.getElementById('pnl').textContent='$0.00';
+
+function connectDeriv(){
+  const url = "https://oauth.deriv.com/oauth2/authorize?app_id=" +
+    encodeURIComponent(APP_ID) +
+    "&l=EN&redirect_uri=" + encodeURIComponent(REDIRECT_URI);
+  window.location.href = url;
 }
+
+function disconnectDeriv(){
+  if(socket){
+    socket.close();
+    socket = null;
+  }
+  authorized = false;
+  document.getElementById("account").textContent = "Not connected";
+  document.getElementById("balance").textContent = "Connect your Deriv account to continue.";
+  document.getElementById("connect").hidden = false;
+  document.getElementById("disconnect").hidden = true;
+  document.getElementById("price").textContent = "--";
+  setStatus("● Disconnected");
+}
+
+function connectSocket(token){
+  if(socket) socket.close();
+
+  socket = new WebSocket(
+    "wss://ws.derivws.com/websockets/v3?app_id=" +
+    encodeURIComponent(APP_ID)
+  );
+
+  socket.onopen = () => {
+    setStatus("Connected to Deriv API; checking authorization...");
+    socket.send(JSON.stringify({authorize: token}));
+  };
+
+  socket.onmessage = event => {
+    const data = JSON.parse(event.data);
+
+    if(data.error){
+      setStatus("API error: " + data.error.message);
+      document.getElementById("priceStatus").textContent = data.error.message;
+      return;
+    }
+
+    if(data.msg_type === "authorize"){
+      authorized = true;
+      const a = data.authorize;
+      document.getElementById("account").textContent =
+        a.loginid || "Authorized";
+      document.getElementById("balance").textContent =
+        "Currency: " + (a.currency || "N/A") +
+        " · Balance: " + (a.balance ?? "N/A");
+      document.getElementById("connect").hidden = true;
+      document.getElementById("disconnect").hidden = false;
+      setStatus("● Authorized with Deriv");
+      subscribePrice();
+    }
+
+    if(data.msg_type === "tick"){
+      document.getElementById("price").textContent =
+        String(data.tick.quote);
+      document.getElementById("priceStatus").textContent =
+        "Latest tick: " + new Date().toLocaleTimeString();
+    }
+  };
+
+  socket.onerror = () => setStatus("Connection error. Please retry.");
+  socket.onclose = () => {
+    if(authorized) setStatus("Connection closed. Reconnect if needed.");
+  };
+}
+
+function subscribePrice(){
+  if(!socket || socket.readyState !== WebSocket.OPEN){
+    document.getElementById("priceStatus").textContent =
+      "Connect Deriv first.";
+    return;
+  }
+
+  if(!authorized){
+    document.getElementById("priceStatus").textContent =
+      "Waiting for Deriv authorization.";
+    return;
+  }
+
+  const symbol = document.getElementById("market").value;
+  document.getElementById("priceStatus").textContent =
+    "Requesting market price...";
+
+  socket.send(JSON.stringify({
+    forget_all: "ticks"
+  }));
+  socket.send(JSON.stringify({
+    ticks: symbol,
+    subscribe: 1
+  }));
+}
+
+function demo(direction){
+  document.getElementById("pnl").textContent = "$0.00";
+  document.getElementById("tradeStatus").textContent =
+    direction + " demo button tested. No order was sent.";
+  startTimer();
+}
+
+function closeDemo(){
+  document.getElementById("pnl").textContent = "$0.00";
+  document.getElementById("tradeStatus").textContent =
+    "Demo closed. No real trade was placed.";
+  stopTimer();
+}
+
 function startTimer(){
- if(timerInterval) clearInterval(timerInterval);
- startedAt=Date.now();
- timerInterval=setInterval(()=>{
-  let s=Math.floor((Date.now()-startedAt)/1000);
-  document.getElementById('timer').textContent=
-   String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
- },250);
+  stopTimer();
+  seconds = 0;
+  updateTimer();
+  timerInterval = setInterval(() => {
+    seconds++;
+    updateTimer();
+  },1000);
 }
-</script></body>
+
+function stopTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function updateTimer(){
+  document.getElementById("timer").textContent =
+    String(Math.floor(seconds/60)).padStart(2,"0") + ":" +
+    String(seconds%60).padStart(2,"0");
+}
+
+/*
+OAuth returns an access token in the URL fragment.
+Read it, then remove the fragment from the visible URL.
+Do not save the token in GitHub or localStorage.
+*/
+(function(){
+  const hash = new URLSearchParams(window.location.hash.slice(1));
+  const token = hash.get("token1");
+  if(token){
+    history.replaceState(null, "", window.location.pathname);
+    connectSocket(token);
+  }
+})();
+</script>
+</body>
 </html>
