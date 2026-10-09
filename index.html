@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bello Pro Trader</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08111f;color:#f1f5f9;font-family:Arial,sans-serif;padding:18px}
+.container{max-width:600px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin:12px 0 24px}
+h1{font-size:23px;margin:0;color:#38bdf8}
+.badge{font-size:11px;background:#163047;color:#7dd3fc;padding:7px 10px;border-radius:20px}
+.card{background:#111e30;border:1px solid #25354b;border-radius:16px;padding:18px;margin-bottom:15px}
+.label{font-size:13px;color:#94a3b8}
+.value{font-size:29px;font-weight:bold;margin:9px 0}
+.muted{color:#94a3b8;font-size:12px}
+.row{display:flex;gap:12px}
+.row>*{flex:1;min-width:0}
+select,input{width:100%;padding:13px;margin-top:8px;border-radius:10px;border:1px solid #334155;background:#0b1728;color:white;font-size:15px}
+button{border:0;border-radius:11px;padding:15px;font-size:15px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px}
+.buy{background:#16a34a;color:white}
+.sell{background:#dc2626;color:white}
+.close{background:#334155;color:white}
+.timer{text-align:center;font-size:36px;font-weight:bold;color:#38bdf8;padding:12px}
+.notice{font-size:12px;line-height:1.6;color:#cbd5e1}
+footer{text-align:center;color:#64748b;font-size:12px;padding:16px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div><h1>BELLO PRO TRADER</h1><div class="muted">Your personal trading dashboard</div></div>
+<div class="badge">DEMO MODE</div>
+</header><div class="card">
+<div class="label">Selected Market</div>
+<select id="market">
+<option>Boom 1000</option>
+<option>Crash 1000</option>
+</select>
+<div class="row">
+<div><div class="label" style="margin-top:18px">Trade Size (Lots)</div><input id="lot" type="number" min="0.01" step="0.01" value="0.01"></div>
+<div><div class="label" style="margin-top:18px">Trade Direction</div><input id="direction" value="No trade" readonly></div>
+</div>
+</div><div class="card">
+<div class="label">Profit / Loss</div>
+<div class="value" id="pnl">$0.00</div>
+<div class="muted" id="status">No demo trade opened</div>
+<div class="notice" style="margin-top:12px">Demo display only. This page is not connected to Deriv or MT5 and does not show real account profit/loss.</div>
+</div><div class="row">
+<div class="card"><div class="label">Trade Timer</div><div class="timer" id="timer">00:00</div><button onclick="startTimer()" class="close">START TIMER</button></div>
+<div class="card"><div class="label">Trade Controls</div><button class="buy" onclick="demoTrade('BUY')">BUY</button><button class="sell" onclick="demoTrade('SELL')">SELL</button><button class="close" onclick="closeTrade()">CLOSE</button></div>
+</div><div class="card">
+<div class="label">Connection</div>
+<div style="margin-top:10px;color:#fbbf24">● Not connected to MT5</div>
+<p class="notice">These buttons are for interface testing only. They do not place trades or calculate live market P/L. Never enter your MT5 password on this page.</p>
+</div>
+<footer>Bello Pro Trader · Personal Demo Dashboard</footer>
+</div><script>
+let startedAt=null, timerInterval=null, demoOpen=false;
+function demoTrade(direction){
+ document.getElementById('direction').value=direction;
+ document.getElementById('status').textContent='Demo button tested — no real order sent';
+ document.getElementById('pnl').textContent='$0.00';
+ demoOpen=true;
+ if(!startedAt) startTimer();
+}
+function closeTrade(){
+ demoOpen=false;
+ document.getElementById('direction').value='No trade';
+ document.getElementById('status').textContent='Demo closed — no real order was placed';
+ document.getElementById('pnl').textContent='$0.00';
+}
+function startTimer(){
+ if(timerInterval) clearInterval(timerInterval);
+ startedAt=Date.now();
+ timerInterval=setInterval(()=>{
+  let s=Math.floor((Date.now()-startedAt)/1000);
+  document.getElementById('timer').textContent=
+   String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+ },250);
+}
+</script></body>
+</html>
